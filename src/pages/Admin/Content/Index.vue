@@ -1,25 +1,26 @@
 <template>
   <div>
+    <q-select
+      v-model="model"
+      use-input
+      use-chips
+      multiple
+      input-debounce="0"
+      @new-value="createValue"
+      :options="tags"
+    />
     <entity-index
       v-model:value="inputs"
-      title="لیست تراکنش ها"
+      title="لیست محتوا"
       :api="api"
       :table="table"
       :table-keys="tableKeys"
-      :create-route-name="'Admin.User.Create'"
+      :create-route-name="'Admin.Content.Create'"
     >
       <template v-slot:table-cell="{inputData, showConfirmRemoveDialog}">
         <q-td :props="inputData.props">
-          <template v-if="inputData.props.col.name === 'photo'">
-            <q-img
-              :src="inputData.props.value"
-              placeholder-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
-              spinner-color="white"
-              style="height: 50px; max-width: 50px"
-            />
-          </template>
-          <template v-else-if="inputData.props.col.name === 'actions'">
-            <q-btn round flat dense size="md" color="info" icon="info" :to="{name:'Admin.Product.Show', params: {id: inputData.props.row.id}}">
+          <template v-if="inputData.props.col.name === 'actions'">
+            <q-btn round flat dense size="md" color="info" icon="info" :to="{name:'Admin.Content.Show', params: {id: inputData.props.row.id}}">
               <q-tooltip>
                 مشاهده
               </q-tooltip>
@@ -30,6 +31,9 @@
                 حذف
               </q-tooltip>
             </q-btn>
+          </template>
+          <template v-else-if="inputData.props.col.name === 'description'">
+            <div v-html="inputData.props.value" />
           </template>
           <template v-else>
             {{ inputData.props.value }}
@@ -51,13 +55,13 @@ export default {
       model: null,
       tags: [],
       expanded: true,
-      api: '/alaa/api/v2/admin/transaction',
+      api: '/alaa/api/v2/admin/c',
       tableKeys: {
         data: 'data',
         total: 'meta.total',
         currentPage: 'meta.current_page',
         perPage: 'meta.per_page',
-        pageKey: 'productPage'
+        pageKey: 'contentPage'
       },
       table: {
         columns: [
@@ -69,44 +73,18 @@ export default {
             field: row => row.id
           },
           {
-            name: 'photo',
-            required: true,
-            label: 'تصویر',
-            align: 'left',
-            field: row => row.photo
-          },
-          {
-            name: 'title',
+            name: 'name',
             required: true,
             label: 'عنوان',
             align: 'left',
-            field: row => row.title
+            field: row => row.name
           },
           {
-            name: 'product_type',
+            name: 'type',
             required: true,
             label: 'نوع',
             align: 'left',
-            field: row => {
-              if (row.product_type) {
-                return row.product_type.display_name
-              } else {
-                return ''
-              }
-            }
-          },
-          {
-            name: 'attribute_set',
-            required: true,
-            label: 'دسته',
-            align: 'left',
-            field: row => {
-              if (row.attribute_set) {
-                return row.attribute_set.name
-              } else {
-                return ''
-              }
-            }
+            field: row => (row.content_type.name === 'video') ? 'ویدئو' : 'جزوه'
           },
           {
             name: 'enable',
@@ -118,14 +96,21 @@ export default {
           {
             name: 'is_free',
             required: true,
-            label: 'فعال',
+            label: 'قیمت گذاری',
             align: 'left',
             field: row => (row.is_free) ? 'رایگان' : 'پولی'
           },
           {
+            name: 'description',
+            required: true,
+            label: 'توضیحات',
+            align: 'left',
+            field: row => row.description
+          },
+          {
             name: 'actions',
             required: true,
-            label: '',
+            label: 'عملیات',
             align: 'left',
             field: ''
           }
@@ -135,17 +120,12 @@ export default {
       inputs: [
         { type: 'input', name: 'id', value: null, label: 'شناسه', col: 'col-md-3' },
         { type: 'input', name: 'name', value: null, label: 'نام', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'نام خانوادگی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'شماره موبایل', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'کدملی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'استان', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'شهر', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'کد پستی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'آدرس', col: 'col-md-9' },
-        { type: 'input', name: 'name', value: null, label: 'مدرسه', col: 'col-md-3' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ ثبت اولیه', col: 'col-md-4' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ اصلاح مدیریتی', col: 'col-md-4' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ نهایی', col: 'col-md-4' }
+        { type: 'input', name: 'description', value: null, label: 'توضیحات', col: 'col-md-3' },
+        { type: 'select', name: 'content_type_id', value: null, options: [{ label: 'جزوه', value: 1 }, { label: 'ویدئو', value: 8 }], label: 'نوع محتوا', col: 'col-md-3' },
+        { type: 'select', name: 'is_free', value: null, options: [{ label: 'رایگان', value: 1 }, { label: 'غیر رایگان', value: 0 }], label: 'وضعیت رایگان / غیر رایگان', col: 'col-md-3' },
+        { type: 'select', name: 'enable', value: null, options: [{ label: 'فعال', value: 1 }, { label: 'غیرفعال', value: 0 }], label: 'وضعیت فعال / غیرفعال', col: 'col-md-3' },
+        { type: 'select', name: 'display', value: null, options: [{ label: 'نمایش', value: 1 }, { label: 'عدم نمایش', value: 0 }], label: 'وضعیت نمایش / عدم نمایش', col: 'col-md-3' },
+        { type: 'dateRange', name: 'created_at_range', value: [], label: 'بازه تاریخ ایجاد', col: 'col-md-4' }
       ]
     }
   },
@@ -173,9 +153,7 @@ export default {
       }
     },
     getRemoveMessage (row) {
-      const firstName = row.first_name
-      const lastName = row.last_name
-      return 'آیا از حذف ' + firstName + ' ' + lastName + ' اطمینان دارید؟'
+      return 'آیا از حذف ' + row.name + ' اطمینان دارید؟'
     }
   }
 }

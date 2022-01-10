@@ -2,11 +2,11 @@
   <div>
     <entity-index
       v-model:value="inputs"
-      title="لیست سفارشات"
+      title="مدیریت دسته های محتوا"
       :api="api"
       :table="table"
       :table-keys="tableKeys"
-      :create-route-name="'Admin.Order.Create'"
+      :create-route-name="'Admin.Set.Create'"
     >
       <template v-slot:table-cell="{inputData, showConfirmRemoveDialog}">
         <q-td :props="inputData.props">
@@ -19,7 +19,7 @@
             />
           </template>
           <template v-else-if="inputData.props.col.name === 'actions'">
-            <q-btn round flat dense size="md" color="info" icon="info" :to="{name:'Admin.Order.Show', params: {id: inputData.props.row.id}}">
+            <q-btn round flat dense size="md" color="info" icon="info" :to="{name:'Admin.Set.Show', params: {id: inputData.props.row.id}}">
               <q-tooltip>
                 مشاهده
               </q-tooltip>
@@ -51,13 +51,13 @@ export default {
       model: null,
       tags: [],
       expanded: true,
-      api: '/alaa/api/v2/admin/order',
+      api: '/alaa/api/v2/admin/set',
       tableKeys: {
         data: 'data',
         total: 'meta.total',
         currentPage: 'meta.current_page',
         perPage: 'meta.per_page',
-        pageKey: 'productPage'
+        pageKey: 'setPage'
       },
       table: {
         columns: [
@@ -69,65 +69,44 @@ export default {
             field: row => row.id
           },
           {
-            name: 'first_name',
+            name: 'photo',
+            required: true,
+            label: 'تصویر',
+            align: 'left',
+            field: row => row.photo
+          },
+          {
+            name: 'name',
             required: true,
             label: 'نام',
             align: 'left',
-            field: row => row.user.first_name
+            field: row => row.name
           },
           {
-            name: 'first_name',
+            name: 'short_name',
             required: true,
-            label: 'نام خانوادگی',
+            label: 'نام کوتاه',
             align: 'left',
-            field: row => row.user.last_name
+            field: row => row.short_name
           },
           {
-            name: 'mobile',
+            name: 'status',
             required: true,
-            label: 'موبایل',
+            label: 'وضعیت',
             align: 'left',
-            field: row => row.user.mobile
+            field: row => row.status
           },
           {
-            name: 'national_code',
+            name: 'show',
             required: true,
-            label: 'کدملی',
+            label: 'نمایش',
             align: 'left',
-            field: row => row.user.national_code
-          },
-          {
-            name: 'price',
-            required: true,
-            label: 'مبلغ(تومان)',
-            align: 'left',
-            field: row => row.price
-          },
-          {
-            name: 'paid_price',
-            required: true,
-            label: 'پرداخت شده(تومان)',
-            align: 'left',
-            field: row => row.price
-          },
-          {
-            name: 'orderstatus',
-            required: true,
-            label: 'وضعیت سفارش',
-            align: 'left',
-            field: row => row.orderstatus.name
-          },
-          {
-            name: 'paymentstatus',
-            required: true,
-            label: 'وضعیت پرداخت',
-            align: 'left',
-            field: row => row.paymentstatus.name
+            field: row => row.show
           },
           {
             name: 'actions',
             required: true,
-            label: '',
+            label: 'عملیات',
             align: 'left',
             field: ''
           }
@@ -135,19 +114,11 @@ export default {
         data: []
       },
       inputs: [
-        { type: 'input', name: 'id', value: null, label: 'شناسه', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'نام', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'نام خانوادگی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'شماره موبایل', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'کدملی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'استان', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'شهر', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'کد پستی', col: 'col-md-3' },
-        { type: 'input', name: 'name', value: null, label: 'آدرس', col: 'col-md-9' },
-        { type: 'input', name: 'name', value: null, label: 'مدرسه', col: 'col-md-3' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ ثبت اولیه', col: 'col-md-4' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ اصلاح مدیریتی', col: 'col-md-4' },
-        { type: 'date', name: 'created_at_range', value: null, label: 'تاریخ نهایی', col: 'col-md-4' }
+        { type: 'input', name: 'id', value: null, label: 'شناسه', col: 'col-md-4' },
+        { type: 'input', name: 'name', value: null, label: 'نام', col: 'col-md-4' },
+        { type: 'input', name: 'shortName', value: null, label: 'نام کوتاه', col: 'col-md-6' },
+        { type: 'select', name: 'product_type_id', value: null, options: [{ label: 'فعال ', value: 1 }, { label: 'غیرفعال', value: 2 }], label: 'وضعیت', col: 'col-md-4' },
+        { type: 'select', name: 'product_type_id', value: null, options: [{ label: 'نمایش ', value: 1 }, { label: 'عدم نمایش', value: 2 }, { label: 'اشتراک', value: 4 }], label: 'وضعیت نمایش / عدم نمایش', col: 'col-md-6' }
       ]
     }
   },

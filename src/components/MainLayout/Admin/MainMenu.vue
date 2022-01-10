@@ -47,6 +47,11 @@ export default {
           routeName: 'Admin.User.Index'
         },
         {
+          title: 'محتوا',
+          icon: 'local_library',
+          routeName: 'Admin.Content.Index'
+        },
+        {
           title: 'محصولات',
           icon: 'local_library',
           routeName: 'Admin.Product.Index'
@@ -64,17 +69,12 @@ export default {
         {
           title: 'کوپن ها',
           icon: 'local_library',
-          routeName: 'Admin.Transaction.Index'
-        },
-        {
-          title: 'محتوا',
-          icon: 'local_library',
-          routeName: 'Admin.Transaction.Index'
+          routeName: 'Admin.Coupon.Index'
         },
         {
           title: 'دسته محتوا',
           icon: 'local_library',
-          routeName: 'Admin.Transaction.Index'
+          routeName: 'Admin.Set.Index'
         },
         {
           title: 'تنظیمات',
@@ -96,7 +96,7 @@ export default {
   },
   methods: {
     logout () {
-      this.$router.push({ name: 'login' })
+      this.$store.dispatch('Auth/logout')
     }
   }
 }
